@@ -3,6 +3,8 @@ const authRoutes = require("./routes/authRoutes");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const productRoutes = require("./routes/productRoutes");
+const { GoogleGenAI } = require("@google/genai");
+const multer = require("multer");
 
 const connectDB = require("./config/db");
 
@@ -35,6 +37,38 @@ app.get("/", (req, res) => {
         success: true,
         message: "Welcome to THE_VOID_Project API"
     });
+});
+
+
+const upload = multer({ storage: multer.memoryStorage() });
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+app.post("/api/extract-text", upload.single("image"), async (req, res) => {
+    try {
+        if (!req.file) {
+            console.log("No file received in /api/extract-text");
+            return res.status(400).json({ error: "Image file is required" });
+        }
+
+        console.log(`Processing image: ${req.file.originalname} (${req.file.mimetype}, ${(req.file.size / 1024).toFixed(1)} KB)`);
+
+        const imageBytes = req.file.buffer;
+        const mimeType = req.file.mimetype;
+
+        const response = await ai.models.generateContent({
+            model: "gemini-3.5-flash",
+            contents: [
+                { inlineData: { data: imageBytes.toString("base64"), mimeType } },
+                { text: "Extract all the text visible in this image, exactly as it appears and also check its compliance with LM rules 2011." },
+            ],
+        });
+
+        console.log("Gemini extraction finished successfully.");
+        res.json({ success: true, text: response.text });
+    } catch (err) {
+        console.error("Extract text error:", err);
+        res.status(500).json({ error: "Failed to process image: " + (err.message || "Unknown error") });
+    }
 });
 
 const PORT = process.env.PORT || 5000;
