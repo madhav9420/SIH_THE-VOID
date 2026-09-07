@@ -2,9 +2,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-
-
-
 const registerUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -33,7 +30,7 @@ const registerUser = async (req, res) => {
             password: hashedPassword
         });
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             message: "User registered successfully",
             user: {
@@ -42,25 +39,20 @@ const registerUser = async (req, res) => {
                 email: user.email
             }
         });
-
     } catch (error) {
-        console.error("Register Error:", error);
+        console.error("Register Error:", error.message);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Server error"
         });
     }
 };
 
-
-
-
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-       
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -68,7 +60,6 @@ const loginUser = async (req, res) => {
             });
         }
 
-      
         const user = await User.findOne({ email });
 
         if (!user) {
@@ -90,18 +81,13 @@ const loginUser = async (req, res) => {
             });
         }
 
-  
         const token = jwt.sign(
-            {
-                userId: user._id
-            },
+            { userId: user._id },
             process.env.JWT_SECRET,
-            {
-                expiresIn: "7d"
-            }
+            { expiresIn: "7d" }
         );
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: "Login successful",
             token,
@@ -111,17 +97,15 @@ const loginUser = async (req, res) => {
                 email: user.email
             }
         });
-
     } catch (error) {
-        console.error("Login Error:", error);
+        console.error("Login Error:", error.message);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Server error"
         });
     }
 };
-
 
 const getProfile = async (req, res) => {
     try {
@@ -135,7 +119,7 @@ const getProfile = async (req, res) => {
             });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             user: {
                 id: user._id,
@@ -143,17 +127,15 @@ const getProfile = async (req, res) => {
                 email: user.email
             }
         });
-
     } catch (error) {
-        console.error("Profile Error:", error);
+        console.error("Profile Error:", error.message);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Server error"
         });
     }
 };
-
 
 module.exports = {
     registerUser,

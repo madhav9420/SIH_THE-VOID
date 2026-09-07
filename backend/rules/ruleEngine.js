@@ -9,65 +9,69 @@ const isEmpty = (value) => {
         return value.trim() === "";
     }
 
+    if (Array.isArray(value)) {
+        return value.length === 0;
+    }
+
     return false;
 };
 
+const createResult = (rule, status, message) => ({
+    ruleId: rule.id,
+    field: rule.field,
+    label: rule.label,
+    status,
+    message,
+    description: rule.description
+});
 
 const validateProduct = (productData) => {
-
-    const results = [];
-
-    for (const rule of packagedCommodityRules) {
-
+    const results = packagedCommodityRules.map((rule) => {
         const value = productData[rule.field];
 
-        if (rule.required && isEmpty(value)) {
-
-            results.push({
-                ruleId: rule.id,
-                field: rule.field,
-                label: rule.label,
-                status: "FAIL",
-                message: `${rule.label} is missing`
-            });
-
-        } else {
-
-            results.push({
-                ruleId: rule.id,
-                field: rule.field,
-                label: rule.label,
-                status: "PASS",
-                message: `${rule.label} detected`
-            });
-
+        if (!rule.required && isEmpty(value)) {
+            return createResult(
+                rule,
+                "NOT_APPLICABLE",
+                `${rule.label} is not applicable or not detected`
+            );
         }
-    }
 
+        if (rule.required && isEmpty(value)) {
+            return createResult(
+                rule,
+                "FAIL",
+                `${rule.label} is missing`
+            );
+        }
+
+        return createResult(
+            rule,
+            "PASS",
+            `${rule.label} detected`
+        );
+    });
+
+    const passedRules = results.filter(
+        (rule) => rule.status === "PASS"
+    );
 
     const failedRules = results.filter(
         (rule) => rule.status === "FAIL"
     );
 
-
-    let overallStatus = "PASS";
-
-    if (failedRules.length > 0) {
-        overallStatus = "FAIL";
-    }
-
+    const applicableRules = results.filter(
+        (rule) => rule.status !== "NOT_APPLICABLE"
+    );
 
     return {
-        overallStatus,
-        totalRules: results.length,
-        passedRules: results.filter(
-            (rule) => rule.status === "PASS"
-        ).length,
+        overallStatus: failedRules.length > 0 ? "FAIL" : "PASS",
+        totalRules: applicableRules.length,
+        passedRules: passedRules.length,
         failedRules: failedRules.length,
         results
     };
 };
-
 
 module.exports = {
     validateProduct

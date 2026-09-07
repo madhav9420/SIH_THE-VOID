@@ -13,14 +13,12 @@ const upload = require("../middleware/uploadMiddleware");
 
 const router = express.Router();
 
-
 router.post(
     "/upload",
     protect,
     upload.single("productImage"),
     uploadProductImage
 );
-
 
 router.post(
     "/extract",
@@ -29,23 +27,8 @@ router.post(
     extractProductData
 );
 
-router.get(
-    "/history",
-    protect,
-    getInspectionHistory
-);
-
-router.get(
-    "/stats",
-    protect,
-    getDashboardStats
-);
-
-router.get(
-    "/:id",
-    protect,
-    getInspectionById
-)
-
+router.get("/history", protect, getInspectionHistory);
+router.get("/stats", protect, getDashboardStats);
+router.get("/:id", protect, getInspectionById);
 
 module.exports = router;

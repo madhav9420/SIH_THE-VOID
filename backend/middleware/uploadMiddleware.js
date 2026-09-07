@@ -9,33 +9,33 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
+    destination: (_req, _file, callback) => {
+        callback(null, uploadDir);
     },
 
-    filename: (req, file, cb) => {
+    filename: (_req, file, callback) => {
         const extension = path.extname(file.originalname);
+        const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extension}`;
 
-        const filename =
-            `${Date.now()}-${Math.round(Math.random() * 1E9)}${extension}`;
-
-        cb(null, filename);
+        callback(null, filename);
     }
 });
 
-const fileFilter = (req, file, cb) => {
-    const allowedTypes = [
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "image/webp"
-    ];
+const allowedMimeTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp"
+];
 
-    if (allowedTypes.includes(file.mimetype)) {
-        cb(null, true);
-    } else {
-        cb(new Error("Only JPG, JPEG, PNG and WEBP images are allowed"));
+const fileFilter = (_req, file, callback) => {
+    if (allowedMimeTypes.includes(file.mimetype)) {
+        return callback(null, true);
     }
+
+    callback(
+        new Error("Only JPG, JPEG, PNG and WEBP images are allowed")
+    );
 };
 
 const upload = multer({
@@ -46,4 +46,4 @@ const upload = multer({
     }
 });
 
-module.exports = upload
+module.exports = upload;

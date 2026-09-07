@@ -4,7 +4,7 @@ const protect = (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
 
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        if (!authHeader?.startsWith("Bearer ")) {
             return res.status(401).json({
                 success: false,
                 message: "Not authorized. Token missing."
@@ -13,17 +13,14 @@ const protect = (req, res, next) => {
 
         const token = authHeader.split(" ")[1];
 
-    
         const decoded = jwt.verify(
             token,
             process.env.JWT_SECRET
         );
 
-    
         req.userId = decoded.userId;
 
-        next();
-
+        return next();
     } catch (error) {
         return res.status(401).json({
             success: false,
@@ -32,4 +29,4 @@ const protect = (req, res, next) => {
     }
 };
 
-module.exports = protect
+module.exports = protect;

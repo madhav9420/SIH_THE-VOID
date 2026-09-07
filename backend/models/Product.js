@@ -13,22 +13,18 @@ const productSchema = new mongoose.Schema(
                 type: String,
                 required: true
             },
-
             originalName: {
                 type: String,
                 required: true
             },
-
             path: {
                 type: String,
                 required: true
             },
-
             mimetype: {
                 type: String,
                 required: true
             },
-
             size: {
                 type: Number,
                 required: true
@@ -46,22 +42,18 @@ const productSchema = new mongoose.Schema(
                 enum: ["PASS", "FAIL", "REVIEW"],
                 default: "REVIEW"
             },
-
             totalRules: {
                 type: Number,
                 default: 0
             },
-
             passedRules: {
                 type: Number,
                 default: 0
             },
-
             failedRules: {
                 type: Number,
                 default: 0
             },
-
             results: {
                 type: Array,
                 default: []

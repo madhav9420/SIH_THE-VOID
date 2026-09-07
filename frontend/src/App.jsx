@@ -1,26 +1,31 @@
 import {
     BrowserRouter,
-    Routes,
+    Navigate,
     Route,
-    Navigate
+    Routes
 } from "react-router-dom";
 
-import Register from "./pages/Register";
-import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import ProductUpload from "./pages/ProductUpload";
-import ProtectedRoute from "./components/ProtectedRoute";
-import InspectionHistory from "./pages/InspectionHistory";
 import InspectionDetails from "./pages/InspectionDetails";
+import InspectionHistory from "./pages/InspectionHistory";
+import Login from "./pages/Login";
+import ProductUpload from "./pages/ProductUpload";
+import Register from "./pages/Register";
+
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
-
                 <Route
                     path="/"
-                    element={<Navigate to="/login" replace />}
+                    element={
+                        <Navigate
+                            to="/login"
+                            replace
+                        />
+                    }
                 />
 
                 <Route
